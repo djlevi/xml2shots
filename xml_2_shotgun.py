@@ -364,9 +364,7 @@ def create_mov_files():
 			upload_shotgun_mov(shot)
 		except:
 			pass
-###Creacion de quicktime para versiones con rvio
-#/Applications/RV64.app/Contents/MacOS/rvio /Volumes/DATOS/BAJAJ_PULSAR/RODAJE_PULSAR/A001_C004_04157Q.RDC/A001_C004_04157Q_001.R3D \
-#-o "PL_010_A (Resolve) (Resolve).mov" -outres 1280 720 -t 25-61 -codec libx264 -outparams pix_fmt=yuv420p vcc:b=2000000000 vcc:g=30 vcc:profile=high vcc:bf=0
+
 
 
 def create_version_entries():
@@ -381,8 +379,8 @@ def create_version_entries():
         sgshot['version_id']=result_version['id']
 
 def upload_shotgun_mov(shot):
-    #for sgshot in win.shot_list:
-    #    result_upload = win.sg.upload("Version",sgshot['version_id'],sgshot['mov_file'],"Version_"+sgshot['shot_code'])
+    for sgshot in win.shot_list:
+        result_upload = win.sg.upload("Version",sgshot['version_id'],sgshot['mov_file'],"Version_"+sgshot['shot_code'])
 
     result_upload = win.sg.upload("Version",shot['version_id'],shot['mov_file'],"sg_uploaded_movie")
 
@@ -415,44 +413,5 @@ win = XMLMainWindow()
 win.show()
 
 app.exec_()
-
-
-
-###Creacion de quicktime para versiones con rvio
-###/Applications/RV64.app/Contents/MacOS/rvio /Volumes/DATOS/BAJAJ_PULSAR/RODAJE_PULSAR/A001_C004_04157Q.RDC/A001_C004_04157Q_001.R3D -o "PL_010_A (Resolve) (Resolve).mov" -outres 1280 720 -t 25-61 -codec libx264 -outparams pix_fmt=yuv420p vcc:b=2000000000 vcc:g=30 vcc:profile=high vcc:bf=0
-
-##Shotgun auth and gathering info
-# from shotgun_api3 import Shotgun
-# sg = Shotgun("https://configura.shotgunstudio.com",login="abraham",password="Levitin1978")
-# sg = Shotgun("https://configura.shotgunstudio.com","API","04bce60d30b81100015f06eb4bd9b5c65cf975b8da7742ed1d9c6588c1caef23")
-# all_projects = sg.find('Project',[],['id','name'])
-# project_list = []
-# for project in all_projects:
-# 	project_list.append({project['name']:project['id']})
-# shots = sg.find("Shot",[['project','is',{'type': 'Project', 'id': 68}]],['code','sg_sequence'])
-# for shot in shots:
-# 	print shot
-
-# project_id = 68 # sin identidad en configura
-# data = {
-#     'project': {'type':'Project','id':project_id},
-#     'code':'code field test',
-#     'description': 'description test',
-#     'sg_status_list':'rev',
-#     'entity': {'type':'Shot','id':1352},
-#     }
-
-# version = sg.create("Version",data)
-# print(version)
-# quicktime = '/data/show/ne2/100_110/anim/01.mlk-02b.mov'
-# version_id = 423
-# result = sg.upload("Version",version_id,quicktime,"sg_uploaded_movie")
-# print result
-#data = { 'project': {'type':'Project','id':68},'code': 'sec_001','description': 'first secuence for test'}
-#result = sg.create('Sequence', data)
-#data = { 'project': {'type':'Project','id':68},'code': 'shot_001','description': 'kkkk','sg_cut_in': 10,\
-# 'sg_cut_out': 20, 'sg_cut_duration': 10, 'sg_cut_order': 1, 'sg_sequence': {'type':'Sequence','id':21}}
-#result = sg.create('Shot', data)
-
 
 
