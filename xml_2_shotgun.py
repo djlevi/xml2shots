@@ -294,11 +294,13 @@ def create_shotgun_versions():
     create_mov_files()
 		
 def create_mov_files():
-	rvio_path = "/Applications/RV64.app/Contents/MacOS/rvio"
+	#rvio_path = "/Applications/RV64.app/Contents/MacOS/rvio"
+	rvio_path = "/Applications/RV64.app/Contents/MacOS/rvio_hw"
 	temp_path = "/tmp/"
 	rvio_args = "-outres 1280 720 -codec libx264 -outparams pix_fmt=yuv420p vcc:b=2000000000 vcc:g=30 vcc:profile=high vcc:bf=0"
 	for shot in win.shot_list:
 		if "[" in shot['pathurl'] and "]" in shot['pathurl']:
+			##chek for image sequences looking for branches
 			file_path=shot['pathurl']
 			frame_range=file_path.partition('[')[-1].rpartition(']')[0].split("-")
 			padding=len(frame_range[0])
@@ -310,60 +312,60 @@ def create_mov_files():
 			rv_input=[shot['pathurl']]
 			time_range = "-t " + str(int(shot['in'])+1) + "-" + shot['out']
 		output_path = "-o "+ temp_path + shot['shot_code'] + ".mov"
-		try:
-			print 100*"-"
-			print rvio_path.split() + rv_input + output_path.split() + time_range.split() + rvio_args.split()
-			#parse subprocess.call command as list items
-			#proc = subprocess.call(rvio_path.split() + rv_input + output_path.split() + time_range.split() + rvio_args.split(),
-			#                        shell=False,
-			#                        stdout=subprocess.PIPE,
-			#                        )
-			proc = subprocess.Popen(rvio_path.split() + rv_input + output_path.split() + time_range.split() + rvio_args.split(),
-			                         shell=False,
-			                         stdout=subprocess.PIPE,
-			                         stderr=subprocess.PIPE
-			                         )
-			for error in proc.stderr:
-				print error
-			for stdout in proc.stdout:
-				if "INFO" in stdout or "WARNING" in stdout: print stdout
-				if "WARNING: MovieFFMpeg: Ignoring frames that are out of input range" in stdout:
-					#proc.terminate()
-					time_range = "-t " + str(int(shot['shot_cut_source_in'])) + "-" + str(int(shot['shot_cut_source_out'])-1)
-					print 100*"-"
-					print "Trying internal clip tc range reference"
-					print rvio_path.split() + rv_input + output_path.split() + time_range.split() + rvio_args.split()
-					proc2 = subprocess.Popen(rvio_path.split() + rv_input + output_path.split() + time_range.split() + rvio_args.split(),
-			                         shell=False,
-			                         stdout=subprocess.PIPE,
-			                         stderr=subprocess.PIPE
-			                         )
-					for error2 in proc2.stderr:
-						print error2
-					for stdout2 in proc2.stdout:
-						if "INFO" in stdout2 or "WARNING" in stdout2: print stdout2
-						if "WARNING: MovieFFMpeg: Ignoring frames that are out of input range" in stdout2:
-							#proc2.terminate()
-							time_range = "-t " + str(int(shot['shot_cut_source_in'])+(24*60*60*win.sequence_info['sec_framerate'])) + "-" + str(int(shot['shot_cut_source_out'])+(24*60*60*win.sequence_info['sec_framerate']-1))
-							print 100*"-"
-							print "Trying internal clip tc range reference with leap in 24hours"
-							print rvio_path.split() + rv_input + output_path.split() + time_range.split() + rvio_args.split()
-							proc3 = subprocess.Popen(rvio_path.split() + rv_input + output_path.split() + time_range.split() + rvio_args.split(),
-			                         shell=False,
-			                         stdout=subprocess.PIPE,
-			                         stderr=subprocess.PIPE
-			                         )
-							for error3 in proc3.stderr:
-								print error3
-							for stdout3 in proc3.stdout:
-								if "INFO" in stdout3 or "WARNING" in stdout3: print stdout3
-			# 				proc3.terminate()
-			# 		proc2.terminate()
-			# proc.terminate()
-			shot['mov_file'] = temp_path + shot['shot_code'] + ".mov"
-			upload_shotgun_mov(shot)
-		except:
-			pass
+		print 100*"-"
+		print rvio_path.split() + rv_input + output_path.split() + time_range.split() + rvio_args.split()
+		#parse subprocess.call command as list items
+		#proc = subprocess.call(rvio_path.split() + rv_input + output_path.split() + time_range.split() + rvio_args.split(),
+		#                        shell=False,
+		#                        stdout=subprocess.PIPE,
+		#                        )
+		proc = subprocess.Popen(rvio_path.split() + rv_input + output_path.split() + time_range.split() + rvio_args.split(),
+		                         shell=False,
+		                         stdout=subprocess.PIPE,
+		                         stderr=subprocess.PIPE
+		                         )
+		proc.wait()
+		for error in proc.stderr:
+			print error
+		for stdout in proc.stdout:
+			if "INFO" in stdout or "WARNING" in stdout: print stdout
+			if "WARNING: MovieFFMpeg: Ignoring frames that are out of input range" in stdout:
+				#proc.terminate()
+				time_range = "-t " + str(int(shot['shot_cut_source_in'])) + "-" + str(int(shot['shot_cut_source_out'])-1)
+				print 100*"-"
+				print "Trying internal clip tc range reference"
+				print rvio_path.split() + rv_input + output_path.split() + time_range.split() + rvio_args.split()
+				proc2 = subprocess.Popen(rvio_path.split() + rv_input + output_path.split() + time_range.split() + rvio_args.split(),
+		                         shell=False,
+		                         stdout=subprocess.PIPE,
+		                         stderr=subprocess.PIPE
+		                         )
+				proc2.wait()
+				for error2 in proc2.stderr:
+					print error2
+				for stdout2 in proc2.stdout:
+					if "INFO" in stdout2 or "WARNING" in stdout2: print stdout2
+					if "WARNING: MovieFFMpeg: Ignoring frames that are out of input range" in stdout2:
+						#proc2.terminate()
+						time_range = "-t " + str(int(shot['shot_cut_source_in'])+(24*60*60*win.sequence_info['sec_framerate'])) + "-" + str(int(shot['shot_cut_source_out'])+(24*60*60*win.sequence_info['sec_framerate']-1))
+						print 100*"-"
+						print "Trying internal clip tc range reference with leap in 24hours"
+						print rvio_path.split() + rv_input + output_path.split() + time_range.split() + rvio_args.split()
+						proc3 = subprocess.Popen(rvio_path.split() + rv_input + output_path.split() + time_range.split() + rvio_args.split(),
+		                         shell=False,
+		                         stdout=subprocess.PIPE,
+		                         stderr=subprocess.PIPE
+		                         )
+						proc3.wait()
+						for error3 in proc3.stderr:
+							print error3
+						for stdout3 in proc3.stdout:
+							if "INFO" in stdout3 or "WARNING" in stdout3: print stdout3
+		# 				proc3.terminate()
+		# 		proc2.terminate()
+		# proc.terminate()
+		shot['mov_file'] = temp_path + shot['shot_code'] + ".mov"
+		upload_shotgun_mov(shot)
 
 
 
@@ -379,10 +381,11 @@ def create_version_entries():
         sgshot['version_id']=result_version['id']
 
 def upload_shotgun_mov(shot):
-    for sgshot in win.shot_list:
-        result_upload = win.sg.upload("Version",sgshot['version_id'],sgshot['mov_file'],"Version_"+sgshot['shot_code'])
-
+    #for sgshot in win.shot_list:
+    #    result_upload = win.sg.upload("Version",sgshot['version_id'],sgshot['mov_file'],"Version_"+sgshot['shot_code'])
+    print "Uploading " + "Version_" + str(shot['shot_code']) + " file " + shot['mov_file']
     result_upload = win.sg.upload("Version",shot['version_id'],shot['mov_file'],"sg_uploaded_movie")
+    print result_upload
 
 
 app = QApplication([])
